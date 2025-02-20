@@ -210,7 +210,7 @@ export const buyCourse = asyncHandler(async (req, res, next) => {
     res.status(201).json({ success: true, sessionId: session.id, url: session.url });
   } catch (error) {
     console.error('Error creating Stripe session:', error);
-    res.status(500).json({ success: false, message: 'Error while creating Stripe payment!' });
+    res.status(500).json({ success: false, message: 'Error while creating a Stripe payment !' });
   }
 });
 
