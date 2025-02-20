@@ -18,7 +18,8 @@ const Navbar = () => {
   const handleLogout = async (e) => {
     e.preventDefault();
     const res = await dispatch(Logout());
-    if (res?.payload?.success) {
+    
+    if (res?.payload != null || undefined) {
       navigate('/');
     }
   };
@@ -159,7 +160,7 @@ const Navbar = () => {
                 </>
               )}
               <button onClick={() => { handleProfileClick(); toggleSidebar(); }} className="p-2 text-white rounded hover:bg-blue-400">Profile</button>
-              <button onClick={() => { handleLogout(); toggleSidebar(); }} className="p-2 text-white rounded hover:bg-blue-400">Logout</button>
+              <button onClick={handleLogout} className="p-2 text-white rounded hover:bg-blue-400">Logout</button>
             </>
           ) : (
             <>

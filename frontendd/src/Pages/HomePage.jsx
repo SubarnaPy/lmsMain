@@ -7,7 +7,7 @@ import InstructorSection from "../Components/HomePage/InstructorSection";
 import HeroSection2 from "../Components/HomePage/HeroSection2";
 import HeroSection1 from "../Components/HomePage/HeroSection1";
 import ReviewSlider from "../Components/HomePage/ReviewSlider";
-import CourseCard from "../Components/Course/CourseCard"; // Assuming you have a CourseCard component
+import CourseCard from "../Components/Course/courseCard"; // Assuming you have a CourseCard component
 import { FaArrowRight, FaRocket, FaUsers, FaChartLine, FaStar } from "react-icons/fa";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useState } from "react";

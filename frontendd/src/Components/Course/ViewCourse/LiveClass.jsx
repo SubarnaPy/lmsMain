@@ -17,7 +17,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 import { useSelector } from 'react-redux';
 import CloseIcon from '@mui/icons-material/Close';
 
-const server_url = 'http://localhost:5001';
+const server_url = 'https://lms4-7d49.onrender.com/';
 
 let connections = {};
 

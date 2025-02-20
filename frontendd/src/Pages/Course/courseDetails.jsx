@@ -198,6 +198,21 @@ const CourseDetails = () => {
           </div>
 
         </div>
+        <div className='flex flex-col gap-4'>
+                                {ACCOUNT_TYPE.INSTRUCTOR !==user?.role &&
+                                <>
+                                {
+                                    alreadyEnrolled ? <button onClick={()=>{navigate("/dashboard/enrolled-courses")}} className='yellowButton'>Go to Course</button> : <button onClick={handleBuyCourse} className='yellowButton'>Buy Now</button>
+                                }
+                                {
+                                alreadyEnrolled ? (<div></div>) : 
+                                (
+                                    cart.find((item) => item._id == courseData._id) ? (<button onClick={()=>{navigate("/dashboard/cart")}} className='blackButton text-richblack-5'>Go to Cart</button>) : (<button onClick={handleAddToCart} className='blackButton text-richblack-5'>Add to Cart</button>)
+                                )
+                            }
+                                </>
+                                }
+                            </div>
       </div>
     </div>
 

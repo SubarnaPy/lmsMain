@@ -202,8 +202,8 @@ export const buyCourse = asyncHandler(async (req, res, next) => {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${process.env.CLIENT_URL}/payment-return?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.CLIENT_URL}/payment-cancel`,
+      success_url: `https://lms4-kappa.vercel.app/payment-return?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `https://lms4-kappa.vercel.app/payment-cancel`,
       metadata: { userId, courses: JSON.stringify(courses) },
     });
 

@@ -1,54 +1,48 @@
-
-
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-hot-toast";
 import axiosInstance from "../Helpers/axiosInstance";
 
-// Function to get data from localStorage
-
-
+// Initial State
 const initialState = {
-  // isLoggedIn: localStorage.getItem("isLoggedIn") ? JSON.parse(localStorage.getItem("isLoggedIn")) : false,
- 
   data: JSON.parse(localStorage.getItem("data")) || {},
-    // role: localStorage.getItem("role") || "",
-  // token: localStorage.getItem("token") ||null, // Get token from localStorage if available
   enrolledCourses: [],
 };
 
-export const getProfile = createAsyncThunk(
-    "/profile/get",
-    async () => {
-      try {
-        const res = axiosInstance.get('/profile/getUserDetails');
-  
-        toast.promise(res, {
-          loading: "loading profile....",
-          success: "Profile loaded successfully",
-          error: "Failed to fetch profile",
-        });
-  
-         console.log(res);
-        
-  
-        const response = await res;
-        console.log(response);
-        console.log(response.data);
+// Function to add token to headers
+const getAuthHeaders = (getState) => {
+  const token = getState().auth.token; // Retrieve token from Redux store
+  if (!token) throw new Error("No token found");
+  return { headers: { Authorization: `Bearer ${token}` } };
+};
 
-        
-        return  await response.data;
-      } catch (error) {
-        toast.error(error?.response?.data?.message);
-      }
+// ** Get Profile **
+export const getProfile = createAsyncThunk(
+  "/profile/get",
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const res = axiosInstance.get("/profile/getUserDetails", getAuthHeaders(getState));
+
+      toast.promise(res, {
+        loading: "Loading profile...",
+        success: "Profile loaded successfully",
+        error: "Failed to fetch profile",
+      });
+
+      const response = await res;
+      return response.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "An error occurred");
+      return rejectWithValue(error?.response?.data || error.message);
     }
-  );
-  // Thunk to get enrolled courses
+  }
+);
+
+// ** Get Enrolled Courses **
 export const getUserEnrolledCourses = createAsyncThunk(
   "/courses/getEnrolled",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
-      const res = axiosInstance.get("/profile/getEnrolledCourses");
-      // console.log(res.data.user.courses); // Log response for debugging purposes
+      const res = axiosInstance.get("/profile/getEnrolledCourses", getAuthHeaders(getState));
 
       toast.promise(res, {
         loading: "Loading enrolled courses...",
@@ -57,7 +51,7 @@ export const getUserEnrolledCourses = createAsyncThunk(
       });
 
       const response = await res;
-      return await response.data.user;
+      return response.data.user;
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return rejectWithValue(error?.response?.data);
@@ -65,77 +59,60 @@ export const getUserEnrolledCourses = createAsyncThunk(
   }
 );
 
-//edit profile
-
+// ** Update Profile Details **
 export const updateAdditionalDetails = createAsyncThunk(
-  'profile/updateAdditionalDetails', // Action type
-  async (data, { rejectWithValue }) => { // Add rejectWithValue
+  "profile/updateAdditionalDetails",
+  async (data, { rejectWithValue, getState }) => {
     try {
-      console.log(data);
+      const response = await axiosInstance.put("/profile/updateProfile", data, getAuthHeaders(getState));
 
-      const response = await axiosInstance.put('/profile/updateProfile', data);
-      console.log(response);
-
-      // Optional: Add success toast
       toast.success("Profile updated successfully");
-
-      return await response.data; // Return the response data for fulfilled state
+      return response.data;
     } catch (error) {
-      // Optional: Display an error toast
       toast.error(error?.response?.data?.message || "An error occurred");
-
-      // Return a rejected value with the error message
       return rejectWithValue(error?.response?.data?.message || error.message);
     }
   }
 );
-// updatePassword, updatePfp,deleteAccount 
-export const updatePassword= createAsyncThunk(
-  async (data, { rejectWithValue }) => {
-      try {
-        const res = axiosInstance.put('/profile/updateProfile',data);
-  
-        toast.promise(res, {
-          loading: "loading profile....",
-          success: "Profile loaded successfully",
-          error: "Failed to fetch profile",
-        });
-  
-        console.log(res);
-        
-  
-        const response = await res;
-        console.log(response);
-        return response.data;
-      } catch (error) {
-        toast.error(error?.response?.data?.message);
-        return rejectWithValue(error.response?.data?.message || error.message);
 
-      }
-    }
-);
-export const updatePfp = createAsyncThunk(
-  'profile/updatePfp',
-  async (formData, { rejectWithValue }) => {
+// ** Update Password **
+export const updatePassword = createAsyncThunk(
+  "profile/updatePassword",
+  async (data, { rejectWithValue, getState }) => {
     try {
-      console.log("Starting profile update...");
+      const res = axiosInstance.put("/profile/updatePassword", data, getAuthHeaders(getState));
 
-      // Inspect FormData contents
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
+      toast.promise(res, {
+        loading: "Updating password...",
+        success: "Password updated successfully",
+        error: "Failed to update password",
+      });
 
-      // Make API call with toast.promise
+      const response = await res;
+      return response.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+// ** Update Profile Picture (Pfp) **
+export const updatePfp = createAsyncThunk(
+  "profile/updatePfp",
+  async (formData, { rejectWithValue, getState }) => {
+    try {
+      console.log("Starting profile picture update...");
+
       const response = await toast.promise(
-        axiosInstance.put('/profile/updateProfile', formData),
+        axiosInstance.put("/profile/updatePfp", formData, getAuthHeaders(getState)),
         {
-          loading: "Updating profile...",
-          success: "Profile updated successfully",
-          error: "Failed to update profile",
+          loading: "Updating profile picture...",
+          success: "Profile picture updated successfully",
+          error: "Failed to update profile picture",
         }
       );
 
-      console.log("Update successful:", response.data);
       return response.data;
     } catch (error) {
       console.error("Update failed:", error.response?.data?.message || error.message);
@@ -145,78 +122,51 @@ export const updatePfp = createAsyncThunk(
   }
 );
 
+// ** Delete Account **
 export const deleteAccount = createAsyncThunk(
-  async (data, { rejectWithValue }) => {
-      try {
-        const res = axiosInstance.put('/profile/updateProfile',data);
-  
-        toast.promise(res, {
-          loading: "loading profile....",
-          success: "Profile loaded successfully",
-          error: "Failed to fetch profile",
-        });
-  
-        console.log(res);
-        
-  
-        const response = await res;
-        console.log(response);
-        return response.data;
-      } catch (error) {
-        toast.error(error?.response?.data?.message);
-        return rejectWithValue(error.response?.data?.message || error.message);
+  "profile/deleteAccount",
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const res = axiosInstance.delete("/profile/delete", getAuthHeaders(getState));
 
-      }
+      toast.promise(res, {
+        loading: "Deleting account...",
+        success: "Account deleted successfully",
+        error: "Failed to delete account",
+      });
+
+      const response = await res;
+      return response.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
+  }
 );
 
-
-
-
+// ** Profile Slice **
 const profileSlice = createSlice({
   name: "profile",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Handle user profile
       .addCase(getProfile.fulfilled, (state, action) => {
-        console.log(action); // Log action for debuggin
-        // g purposes
-        if(!action?.payload?.data){
-          console.log("i ama hare")
+        console.log(action);
+        if (!action?.payload?.data) {
           localStorage.clear();
-      state.isLoggedIn = false;
-      state.data = {};
-      state.role = "";
-      state.token = null;
-
+          state.isLoggedIn = false;
+          state.data = {};
+          state.role = "";
+          state.token = null;
         }
-        console.log(action?.payload?.data)
-        localStorage.setItem("data",JSON.stringify( action.payload.data));
-        console.log(state.data)
+        localStorage.setItem("data", JSON.stringify(action.payload.data));
         state.data = action?.payload?.data;
-       
-        
-        // state.user = action?.payload.data;
-        
-      // Handle user logout
-      
-      // Handle user details
-      
-     })
-     .addCase(updateAdditionalDetails.fulfilled,(state, action) => {
-      console.log(action.payload.newuser); // Log action for debugging purposes
-      localStorage.setItem("data", JSON.stringify(action?.payload.newuser));
-      
-       state.data = action?.payload.newuser;
-      
-    // Handle user logout
-    
-    // Handle user details
-    
-   })
-  
+      })
+      .addCase(updateAdditionalDetails.fulfilled, (state, action) => {
+        localStorage.setItem("data", JSON.stringify(action?.payload.newuser));
+        state.data = action?.payload.newuser;
+      })
       .addCase(getUserEnrolledCourses.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -229,11 +179,7 @@ const profileSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload || "Failed to load courses";
       });
-
-
   }
 });
 
-export const {} = profileSlice.actions;
 export default profileSlice.reducer;
- 

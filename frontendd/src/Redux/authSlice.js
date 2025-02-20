@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-hot-toast";
 import axiosInstance from "../Helpers/axiosInstance";
 import { loginApi, sendOtpApi } from "./Actions/authApi";
-import { Await } from "react-router-dom";
+import { Await, Navigate } from "react-router-dom";
 
 // Initial state
 const initialState = {
@@ -309,6 +309,8 @@ const authSlice = createSlice({
       state.role = "";
       state.token = null;
       toast.success("Logged out successfully");
+      
+      Navigate('/');
     })
     .addCase(Logout.rejected, (state, action) => {
       toast.error("Failed to log out");

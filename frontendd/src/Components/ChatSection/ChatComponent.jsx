@@ -5,7 +5,7 @@ import axios from "axios";
 const ChatComponent = ({ courseId, userId }) => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
-  const socket = io("http://localhost:5001"); // Replace with your backend URL
+  const socket = io("https://lms4-7d49.onrender.com"); // Replace with your backend URL
 
   // Get token from localStorage
   const token = localStorage.getItem("token");
@@ -15,7 +15,7 @@ const ChatComponent = ({ courseId, userId }) => {
 
     // Fetch previous chat messages
     axios
-      .get(`http://localhost:5001/api/v1/chat/${courseId}`, {
+      .get(`https://lms4-7d49.onrender.com/api/v1/chat/${courseId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -49,7 +49,7 @@ const ChatComponent = ({ courseId, userId }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:5001/api/v1/chat/${courseId}`,
+        `https://lms4-7d49.onrender.com/api/v1/chat/${courseId}`,
         { 
           message, 
           userId  // Ensure userId is sent to the backend
@@ -71,12 +71,12 @@ const ChatComponent = ({ courseId, userId }) => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto bg-gray-100 shadow-lg rounded-lg overflow-hidden">
-      <div className="bg-blue-600 text-white py-3 px-4 text-center font-semibold">
+    <div className="w-full max-w-md mx-auto overflow-hidden bg-gray-100 rounded-lg shadow-lg">
+      <div className="px-4 py-3 font-semibold text-center text-white bg-blue-600">
         Course Chat
       </div>
 
-      <div className="h-80 overflow-y-auto p-4 space-y-2">
+      <div className="p-4 space-y-2 overflow-y-auto h-80">
         {messages.map((msg, index) => {
           // Ensure correct sender check
           const isSender = msg?.sender?._id === userId || msg?.sender === userId;
@@ -102,7 +102,7 @@ const ChatComponent = ({ courseId, userId }) => {
         })}
       </div>
 
-      <div className="border-t border-gray-300 p-3 flex items-center">
+      <div className="flex items-center p-3 border-t border-gray-300">
         <input
           type="text"
           value={message}
@@ -112,7 +112,7 @@ const ChatComponent = ({ courseId, userId }) => {
         />
         <button
           onClick={sendMessage}
-          className="ml-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+          className="px-4 py-2 ml-2 text-white transition bg-blue-500 rounded-md hover:bg-blue-600"
         >
           Send
         </button>
